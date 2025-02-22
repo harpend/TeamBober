@@ -1,21 +1,18 @@
 from flask import Flask
-from flask_jwt_extended import JWTManager
-from flask_cors import CORS
-from sockets import socketio
-from db import app
+from db import mongo
 from routes.issues import issues_bp
-from routes.auth import auth_bp
 from routes.upvotes import upvotes_bp
 
-app.config["JWT_SECRET_KEY"] = "supersecret"  # Change this in production
-jwt = JWTManager(app)
-CORS(app)
+app = Flask(__name__)
+# Be sure to include your database name in the URI (e.g., "CommunityReports")
+app.config["MONGO_URI"] = "mongodb+srv://austink2109:tvUmNdoJn4wIeUeV@cluster0.l7van.mongodb.net/CommunityReports?retryWrites=true&w=majority"
 
-# Register routes
-app.register_blueprint(issues_bp)
-app.register_blueprint(auth_bp)
-app.register_blueprint(upvotes_bp)
+# Initialize PyMongo with the Flask app
+mongo.init_app(app)
 
-if __name__ == "__main__":
-    socketio.init_app(app, cors_allowed_origins="*")
-    socketio.run(app, debug=True)
+# Register blueprints
+app.register_blueprint(issues_bp, url_prefix="/issues")
+app.register_blueprint(upvotes_bp, url_prefix="/issues")
+
+if __name__ == '__main__':
+    app.run(debug=True)

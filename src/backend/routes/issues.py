@@ -1,35 +1,30 @@
 from flask import Blueprint, request, jsonify
-from bson.objectid import ObjectId
-from db import issues_collection
-from sockets import socketio
+from bson.json_util import dumps
+from db import mongo
 
 issues_bp = Blueprint('issues', __name__)
 
-# 🔹 Report a new issue
-@issues_bp.route('/api/issues', methods=['POST'])
-def create_issue():
-    data = request.json
-    new_issue = {
-        "title": data["title"],
-        "description": data["description"],
-        "location": data["location"],
-        "upvotes": 0,
-        "nickname": data.get("nickname", "Anonymous")  # Store nickname
-    }
-    result = issues_collection.insert_one(new_issue)
+# POST /issues/report
+@issues_bp.route('/report', methods=['POST'])
+def report_issue():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
 
-    issue_id = str(result.inserted_id)
-    new_issue["_id"] = issue_id
+    result = mongo.db.issues.insert_one(data)
+    new_issue = mongo.db.issues.find_one({"_id": result.inserted_id})
+    return dumps(new_issue), 201, {'Content-Type': 'application/json'}
 
-    # 🔹 Send real-time update
-    socketio.emit('new_issue', new_issue)
-
-    return jsonify({"message": "Issue created!", "id": issue_id}), 201
-
-# 🔹 Get all issues
-@issues_bp.route('/api/issues', methods=['GET'])
+# GET /issues
+@issues_bp.route('', methods=['GET'])
 def get_issues():
-    issues = list(issues_collection.find({}, {"_id": 1, "title": 1, "description": 1, "upvotes": 1, "nickname": 1}))
-    for issue in issues:
-        issue["_id"] = str(issue["_id"])  # Convert ObjectId to string
-    return jsonify(issues)
+    issues = mongo.db.issues.find()
+    return dumps(issues), 200, {'Content-Type': 'application/json'}
+
+# GET /issues/recent
+@issues_bp.route('/recent', methods=['GET'])
+def get_recent_issues():
+    # Assuming "created_at" is stored in a format that allows sorting.
+    # Sorting descending (newest first) and limiting to 10 results.
+    issues = mongo.db.issues.find().sort("created_at", -1).limit(10)
+    return dumps(issues), 200, {'Content-Type': 'application/json'}
