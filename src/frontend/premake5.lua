@@ -33,13 +33,20 @@ project "bober-ui"
       "vendor/glfw/include",
       "vendor/imgui/",
       "vendor/stb_image/",
+      "vendor/nlohmann/",
    }
 
    links
    {
        "glfw",
+       "curl",
    }
 
+  libdirs
+  {
+    "/usr/lib/"
+  }
+    
   -- only for me!
    postbuildcommands {
      "premake export-compile-commands",

@@ -1,10 +1,14 @@
 #include "user_interface.h"
+#include <cstdlib>
 #include <print>
 #include "bb_images.h"
 #include "imgui.h"
 #include <filesystem>
 #include <format>
+#include <string.h>
+#include <nlohmann/json.hpp>
 #include "../api/backend_api.h"
+#include "imgui_internal.h"
 
 void renderer::init()
 {
@@ -23,14 +27,43 @@ void renderer::init()
   ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
   ImGui::GetStyle().ScaleAllSizes(1.5);
 
-  std::print("{}", BackendAPI::getIssues());
+  std::print("{}", BackendAPI::get_random_issue());
+
   
+
+
+
+  for (int i = 0; i < 10; i++)
+  {
+    add_issue();
+  }
 
 }
 
 void renderer::shutdown()
 {
   
+}
+
+void renderer::load_all_images()
+{
+}
+
+void renderer::add_issue()
+{
+ 
+  nlohmann::json json_data= nlohmann::json::parse(BackendAPI::get_random_issue());
+
+  Issue issue;
+  std::string desc = json_data["description"];
+  std::string title= json_data["title"];
+  std::string author= json_data["nickname"];
+  strcpy(issue.desc, desc.c_str());
+  strcpy(issue.title, title.c_str());
+  strcpy(issue.author, author.c_str());
+  issue.id = renderer::issues.size();
+  
+  renderer::issues.push_back(issue);
 }
 
 void renderer::draw_ui()
@@ -163,14 +196,34 @@ void renderer::draw_menu_bar()
 
 void renderer::draw_community_feed()
 {
+  static float cooldown = 0.0;
   
-  ImGui::Begin("Community Feed");
+  ImGui::Begin("Community Feed", NULL, ImGuiWindowFlags_NoScrollbar);
 
   for (auto& issue : issues)
   {
     draw_issue(issue);
   }
+
+  cooldown -= ImGui::GetIO().DeltaTime;
+  cooldown = fmax(cooldown, 0.0);
   
+  if (ImGui::GetScrollY() == ImGui::GetScrollMaxY())
+  {
+    if (cooldown < 0.01)
+    {
+      for(int i = 0; i < rand() % 4; i++)
+        add_issue();
+    }
+    else
+    {
+      ImGui::SeparatorText("LOADING...");
+    }
+
+
+    cooldown = (float) rand() / (float) (RAND_MAX) * 2.0;
+    
+  }
   ImGui::End();
 }
 
@@ -213,6 +266,13 @@ void renderer::draw_issue(Issue& issue)
   ImGui::Text("%s", issue.title);
   ImGui::TextWrapped("%s", issue.desc);
   ImGui::Text("by: %s", issue.author);
+
+  ImGui::PushID(issue.id);
+  if (ImGui::CollapsingHeader("Media"))
+  {
+    ImGui::Image((ImTextureID)(intptr_t) bobr_image.rid, ImVec2{(float) bobr_image.width / 10.0f, (float) bobr_image.height / 10.0f});
+  }
+  ImGui::PopID();
   
   ImGui::Separator();
 }
