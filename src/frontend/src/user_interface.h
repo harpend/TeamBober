@@ -5,10 +5,10 @@
 
 struct Issue
 {
-  std::string user{"John Doe"};
-  std::string desc{ "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras et nibh erat. Integer turpis orci, tempus id quam eu, posuere blandit risus. Integer sed tincidunt magna, ut porta enim. Donec imperdiet placerat augue, vel maximus ante placerat id."};
-  std::string title{"Loren ipsum"};
-  std::string location;
+  char author[50] {"John Doe"};
+  char desc[500] { "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras et nibh erat. Integer turpis orci, tempus id quam eu, posuere blandit risus. Integer sed tincidunt magna, ut porta enim. Donec imperdiet placerat augue, vel maximus ante placerat id."};
+  char title[50] {"Loren ipsum"};
+  char location[15];
 };
 
 
@@ -37,4 +37,6 @@ private:
 
 
   BB_Image bobr_image;
+  char username[50] {"anonymous"};
+  uint32_t wallet{0};
 };

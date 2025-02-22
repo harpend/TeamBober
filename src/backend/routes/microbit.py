@@ -3,7 +3,7 @@ from bson.json_util import dumps
 from db import mongo
 import requests
 
-microbit_bp = issues_bp = Blueprint('microbit', __name__)
+microbit_bp = Blueprint('microbit', __name__)
 microbit_url = 'insert endpoint/api/bobr_alert'
 # POST /microbit/bobr_alert
 @microbit_bp.route('/bobr_alert', methods=['POST'])

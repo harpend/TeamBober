@@ -2,6 +2,7 @@ from flask import Flask
 from db import mongo
 from routes.issues import issues_bp
 from routes.upvotes import upvotes_bp
+import os
 from routes.microbit import microbit_bp
 
 app = Flask(__name__)
