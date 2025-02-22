@@ -7,7 +7,7 @@ import os
 issues_bp = Blueprint('issues', __name__)
 
 # Define the uploads folder relative to this file (assuming this file is in "routes" and static is one level up)
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "static/uploads")
+UPLOAD_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static", "uploads"))
 
 # Define allowed file extensions for images
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
@@ -28,11 +28,11 @@ def report_issue():
     if 'image' in request.files:
         file = request.files['image']
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+            filename = secure_filename(file.filename).replace(" ", "_")
             file_path = os.path.join(UPLOAD_FOLDER, filename)
             file.save(file_path)
             # Build an external URL for the uploaded image
-            image_url = url_for('static', filename='uploads/' + filename, _external=True)
+            image_url = url_for('serve_uploaded_file', filename=filename, _external=True)
             images.append(image_url)
     
     # Add the images list to our data dictionary
@@ -54,3 +54,18 @@ def get_issues():
 def get_recent_issues():
     issues = mongo.db.issues.find().sort("created_at", -1).limit(10)
     return dumps(issues), 200, {'Content-Type': 'application/json'}
+
+import random
+
+# GET /issues/get_issue
+@issues_bp.route('/get_issue', methods=['GET'])
+def get_random_issue():
+    # Fetch all issues
+    issues = list(mongo.db.issues.find())
+    
+    # If there are issues, return a random one
+    if issues:
+        random_issue = random.choice(issues)
+        return dumps(random_issue), 200, {'Content-Type': 'application/json'}
+    else:
+        return jsonify({"message": "No issues found"}), 404

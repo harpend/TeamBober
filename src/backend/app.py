@@ -20,6 +20,16 @@ app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "static/up
 # Optionally, set allowed extensions (e.g., jpg, png)
 app.config["ALLOWED_EXTENSIONS"] = {"png", "jpg", "jpeg"}
 
+from flask import Flask, send_from_directory
+import os
+
+app = Flask(__name__)
+
+# Static files serving route
+@app.route('/uploads/<path:filename>')
+def serve_uploaded_file(filename):
+    return send_from_directory(os.path.join(app.root_path, "static", "uploads"), filename)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
