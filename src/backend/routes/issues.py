@@ -24,7 +24,5 @@ def get_issues():
 # GET /issues/recent
 @issues_bp.route('/recent', methods=['GET'])
 def get_recent_issues():
-    # Assuming "created_at" is stored in a format that allows sorting.
-    # Sorting descending (newest first) and limiting to 10 results.
     issues = mongo.db.issues.find().sort("created_at", -1).limit(10)
     return dumps(issues), 200, {'Content-Type': 'application/json'}
