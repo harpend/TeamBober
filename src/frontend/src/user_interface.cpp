@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include <filesystem>
 #include <format>
+#include "../api/backend_api.h"
 
 void renderer::init()
 {
@@ -21,6 +22,9 @@ void renderer::init()
 
   ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
   ImGui::GetStyle().ScaleAllSizes(1.5);
+
+  std::print("{}", BackendAPI::getIssues());
+  
 
 }
 
