@@ -37,6 +37,6 @@ private:
 
 
   BB_Image bobr_image;
-  char username[50] {"anonymous"};
+  char username[50] {"guest"};
   uint32_t wallet{0};
 };

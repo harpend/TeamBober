@@ -92,8 +92,12 @@ void renderer::draw_menu_bar()
       if (ImGui::BeginMenu(fmt.c_str()))
       {
         static char username_buff[50] = {0};
-        ImGui::Text("change username");
-        if (ImGui::InputTextWithHint("##", "enter here", username_buff, 50, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+        static char dummy_pwd_buff[50] = {0};
+
+        ImGui::InputTextWithHint("##x", "enter username", username_buff, 50);
+        ImGui::InputTextWithHint("##xx", "enter password", dummy_pwd_buff, 50, ImGuiInputTextFlags_Password);
+
+        if (ImGui::Button("login"))
         {
           memcpy(renderer::username, username_buff, 50);
         }
@@ -124,6 +128,23 @@ void renderer::draw_menu_bar()
         ImGui::EndMenu();
       }
 
+
+      if (strcmp(renderer::username, "king-bobr") == 0)
+      {
+
+        ImGui::Separator();
+        if (ImGui::BeginMenu("Debug"))
+        {
+          if (ImGui::Button("add 100 bobrbux"))
+          {
+            renderer::wallet += 100;
+          }
+      
+          ImGui::EndMenu();
+        }
+        // ImGui::Separator();
+      }
+      
 
       ImGui::Separator();
 
