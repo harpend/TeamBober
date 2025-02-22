@@ -35,7 +35,7 @@ int main()
 
   if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
   {
-    std::print("noo!!");
+    std::println("noo!!");
   }
 
   IMGUI_CHECKVERSION();
@@ -43,19 +43,6 @@ int main()
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 150");
   
-  ImGui::StyleColorsDark();
-  ImGuiIO& io = ImGui::GetIO();
-  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-  ImFont* f = io.Fonts->AddFontFromFileTTF("assets/jetbrains.ttf", 30);
-
-
-  
-  ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
-
-  
-  ImGui::GetStyle().ScaleAllSizes(1.75);
-  // ImGui::GetIO().FontGlobalScale = 1.25;
-
   bobr_ui.init();
   
   while (!glfwWindowShouldClose(window))
