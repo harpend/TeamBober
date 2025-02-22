@@ -1,4 +1,4 @@
-workspace "bober-ui"
+workspace "bobr-app"
    configurations { "debug", "release" }
 
 project "bober-ui"
@@ -11,8 +11,9 @@ project "bober-ui"
    objdir "build/obj/%{cfg.buildcfg}"
    
    files {
-      "**.h",
+     "**.h",
       "**.cpp",
+
       "vendor/glad/src/glad.c",
 
       "vendor/imgui/*.cpp",
