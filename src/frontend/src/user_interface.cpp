@@ -1,6 +1,22 @@
 #include "user_interface.h"
+#include <print>
+#include "bb_images.h"
 #include "imgui.h"
+#include <filesystem>
 
+void renderer::init()
+{
+  std::print("fs: {}", std::filesystem::current_path().c_str());
+
+  bool r = bb_utils::load_from_file("assets/bobr.png", &bobr_image.rid, &bobr_image.width, &bobr_image.height);
+  std::print("loaded? {}", r);
+
+}
+
+void renderer::shutdown()
+{
+  
+}
 
 void renderer::draw_ui()
 {
@@ -10,6 +26,12 @@ void renderer::draw_ui()
   draw_community_feed();
   draw_create_issue();
   draw_saved_issues();
+
+
+  ImGui::Begin("bobr image");
+  // std::print("{}", bobr_image.rid);
+  ImGui::Image((ImTextureID)(intptr_t) bobr_image.rid, ImVec2{(float) bobr_image.width, (float) bobr_image.height});
+  ImGui::End();
 
 
   ImGui::ShowDemoWindow();
@@ -119,7 +141,7 @@ void renderer::draw_issue(Issue& issue)
 {
   ImGui::Separator();
   ImGui::Text("%s", issue.title.c_str());
-  ImGui::Text("%s", issue.desc.c_str());
+  ImGui::TextWrapped("%s", issue.desc.c_str());
   ImGui::Text("by: %s", issue.user.c_str());
   ImGui::Separator();
 }

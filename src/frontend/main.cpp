@@ -9,6 +9,9 @@
 #include <print>
 
 #include "src/user_interface.h"
+#include "src/bb_images.h"
+
+#include <filesystem>
 
 renderer bobr_ui;
 
@@ -41,10 +44,20 @@ int main()
   ImGui_ImplOpenGL3_Init("#version 150");
   
   ImGui::StyleColorsDark();
-  ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  ImGuiIO& io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  ImFont* f = io.Fonts->AddFontFromFileTTF("assets/jetbrains.ttf", 30);
+
+
+  
   ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
 
+  
+  ImGui::GetStyle().ScaleAllSizes(1.75);
+  // ImGui::GetIO().FontGlobalScale = 1.25;
 
+  bobr_ui.init();
+  
   while (!glfwWindowShouldClose(window))
   {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -64,6 +77,7 @@ int main()
     glfwPollEvents();
   }
 
+  bobr_ui.shutdown();
 
   glfwTerminate();
   

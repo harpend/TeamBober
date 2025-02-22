@@ -1,13 +1,21 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <cstdint>
 
 struct Issue
 {
-  std::string user{" example username"};
-  std::string desc{ "hello this is an example descriptiong"};
-  std::string title{" CHAMGE THIS ABOUT THE BOBR SOCIETY"};
+  std::string user{"John Doe"};
+  std::string desc{ "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras et nibh erat. Integer turpis orci, tempus id quam eu, posuere blandit risus. Integer sed tincidunt magna, ut porta enim. Donec imperdiet placerat augue, vel maximus ante placerat id."};
+  std::string title{"Loren ipsum"};
   std::string location;
+};
+
+
+struct BB_Image
+{
+  uint32_t rid{0};
+  int  width{0}, height{0};
 };
 
 
@@ -26,4 +34,7 @@ private:
   void draw_issue(Issue& issue);
 private:
   std::vector<Issue> issues{100};
+
+
+  BB_Image bobr_image;
 };
