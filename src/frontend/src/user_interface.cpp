@@ -55,7 +55,7 @@ void renderer::init()
 
 void renderer::load_issues() 
 {
-  renderer::isssues.clear();
+  renderer::issues.clear();
   nlohmann::json every_entry= nlohmann::json::parse(BackendAPI::get_issues());
   for (int i = 0; i < every_entry.size(); i++)
   {
@@ -67,7 +67,13 @@ void renderer::load_issues()
     strcpy(issue.desc, desc.c_str());
     strcpy(issue.title, title.c_str());
     strcpy(issue.author, author.c_str());
-    issue.id = renderer::issues.size();
+    issue.idx = renderer::issues.size();
+
+    issue.upvotes = json_data["upvotes"];
+
+
+    std::string _id = json_data["issue_id"];
+    strcpy(issue.id, _id.c_str());
 
     auto& paths = json_data["images"];
 
