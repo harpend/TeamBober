@@ -194,6 +194,17 @@ void renderer::draw_menu_bar()
       
         ImGui::EndMenu();
       }
+      
+      ImGui::Separator();
+      if (ImGui::BeginMenu("Donate"))
+      {
+        ImGui::Text("bobr-app v0.1.0");
+        ImGui::Text("by team-bober");
+        ImGui::SameLine();
+        ImGui::TextLinkOpenURL("(donate)", "https://beavertrust.org/");
+      
+        ImGui::EndMenu();
+      }
 
 
       if (strcmp(renderer::username, "king-bobr") == 0)
