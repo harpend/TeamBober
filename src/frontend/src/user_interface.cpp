@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <format>
 #include <string.h>
+#include <ranges>
 #include <nlohmann/json.hpp>
 #include "../api/backend_api.h"
 #include "imgui_internal.h"
@@ -29,8 +30,13 @@ void renderer::init()
 
 
 
-  // std::print("{}", BackendAPI::get_random_issue());
-
+  // load every file in backend static
+  std::filesystem::path dir = "../../backend/static/uploads";
+  std::ranges::for_each(
+    std::filesystem::directory_iterator{dir},
+    [](const auto& dir_entry) {std::println("{}", dir_entry)};
+  );
+  
   
 
   
