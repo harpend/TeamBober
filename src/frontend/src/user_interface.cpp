@@ -41,11 +41,23 @@ void renderer::init()
       renderer::path_to_img[dir_entry.filename().c_str()] = img;
     }
   );
-   
 
+
+  for (int i = 0; i < 5; i++)
+  {
+    BB_Image img;
+    bb_utils::load_from_file(std::string("assets/").append(renderer::enum_to_bobr[i]).c_str(), &img.rid, &img.width, &img.height);
+    renderer::path_to_img[renderer::enum_to_bobr[i].c_str()] = img;
+  }
   
+  load_issues();
+}
+
+void renderer::load_issues() 
+{
+  renderer::issues.clear();
   nlohmann::json every_entry= nlohmann::json::parse(BackendAPI::get_issues());
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < every_entry.size(); i++)
   {
     nlohmann::json json_data = every_entry[i];
     Issue issue;
@@ -55,7 +67,16 @@ void renderer::init()
     strcpy(issue.desc, desc.c_str());
     strcpy(issue.title, title.c_str());
     strcpy(issue.author, author.c_str());
-    issue.id = renderer::issues.size();
+    issue.idx = renderer::issues.size();
+
+    std::string stat = json_data["status"];
+    strcpy(issue.status, stat.c_str());
+
+    issue.upvotes = json_data["upvotes"];
+
+
+    std::string _id = json_data["issue_id"];
+    strcpy(issue.id, _id.c_str());
 
     auto& paths = json_data["images"];
 
@@ -67,7 +88,6 @@ void renderer::init()
   
     renderer::issues.push_back(issue);
   }
-
 }
 
 void renderer::shutdown()
@@ -107,7 +127,40 @@ void renderer::draw_ui()
 
 
   ImGui::Begin("Upgrade Bobr");
-  ImGui::Image((ImTextureID)(intptr_t) bobr_image.rid, ImVec2{(float) bobr_image.width, (float) bobr_image.height});
+  static bober_fits output{bober_fits::POORBOBR};
+  static uint8_t unlocked_bobrs = 1;
+  static int item_current = 0;
+
+  // if (ImGui::Button("unlocked next bobr"))
+
+  // ImGui::Enum
+  if (unlocked_bobrs != 5)
+  {
+    std::string msg = std::format("upgrade bobr using {} bobrbux", renderer::prices[unlocked_bobrs]);
+
+    if (ImGui::Button(msg.c_str()) && renderer::wallet >= renderer::prices[unlocked_bobrs])
+    {
+
+      renderer::wallet -= renderer::prices[unlocked_bobrs];
+      unlocked_bobrs++;
+    
+    }
+
+
+    
+    if(ImGui::IsItemHovered())
+    {
+      if (renderer::wallet < renderer::prices[unlocked_bobrs])
+        ImGui::SetTooltip("You dont have enough bobrbux");
+    }
+  }
+  
+  // 
+  const char* items[] = {"poor bobr", "babushka bobr", "bat bobr", "cool bobr", "fancy bobr"};
+  ImGui::Combo("equipped", &item_current, items, unlocked_bobrs);
+  
+
+  ImGui::Image((ImTextureID)(intptr_t) renderer::path_to_img[renderer::enum_to_bobr[item_current]].rid, ImVec2{(float) bobr_image.width, (float) bobr_image.height});
   ImGui::End();
 
 
@@ -194,6 +247,18 @@ void renderer::draw_menu_bar()
       
         ImGui::EndMenu();
       }
+      
+      ImGui::Separator();
+      if (ImGui::BeginMenu("Donate"))
+      {
+        ImGui::Text("bobr-app v0.1.0");
+        ImGui::Text("by team-bober");
+        ImGui::SameLine();
+        ImGui::TextLinkOpenURL("(donate)", "https://beavertrust.org/");
+      
+        ImGui::EndMenu();
+      }
+      
 
 
       if (strcmp(renderer::username, "king-bobr") == 0)
@@ -229,7 +294,9 @@ void renderer::draw_community_feed()
   static float cooldown = 0.0;
   
   ImGui::Begin("Community Feed", NULL, ImGuiWindowFlags_NoScrollbar);
-
+  if (ImGui::Button("Refresh")) {
+    load_issues();
+  }
   for (auto& issue : issues)
   {
     draw_issue(issue);
@@ -247,12 +314,26 @@ void renderer::draw_create_issue()
   ImGui::InputText("title", new_issue.title, 50);
   ImGui::InputTextMultiline("description", new_issue.desc, 500, ImVec2{0, 0});
   ImGui::InputText("location", new_issue.location, 15);
-  ImGui::Button("add media");
+
+
+  static char dummy[100];
+  static uint32_t attachs = 0;
+  
+  if(ImGui::InputText("add image paths", dummy, 50, ImGuiInputTextFlags_EnterReturnsTrue))
+  {
+    memset(dummy, 0, 100);
+    attachs++;
+    ImGui::FocusItem();
+  }
+
+  ImGui::Text("attatchments: %d", attachs);
+  
   if (ImGui::Button("create issue"))
   {
     strcpy(new_issue.author, renderer::username);
     renderer::issues.push_back(new_issue);
     new_issue = {};
+    attachs = 0;
   }
     
   ImGui::End();
@@ -262,8 +343,14 @@ void renderer::draw_saved_issues()
 {
   
   ImGui::Begin("My Impact");
-  ImGui::Text("example start\n\n\n\n\nexample end");
+  for (Issue& issue : renderer::my_issues)
+  {
+    draw_my_issue(issue);
+  }
   ImGui::End();
+
+
+  
 }
 
 /*
@@ -288,12 +375,41 @@ void renderer::draw_issue(Issue& issue)
     ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - ImGui::CalcTextSize(credits.c_str()).x);
     ImGui::Text("by: %s", issue.author);
   }
-  
+  ImGui::Text("(%s)", issue.status);
   ImGui::TextWrapped("%s", issue.desc);
+  ImGui::Text("community support: %d", issue.upvotes);
 
 
-  ImGui::PushID(issue.id);
-  static int img_idx = 0;
+  ImGui::PushID(issue.idx);
+  if(ImGui::ArrowButton("##up", ImGuiDir_Up))
+  {
+    issue.upvotes++;
+    std::string is = issue.id;
+    BackendAPI::voteIssue(is);
+    
+    std::println("{}", issue.id);
+  }
+  ImGui::PopID();
+
+
+  if (ImGui::GetContentRegionMax().x > 300)
+  {
+    ImGui::PushID(issue.idx);
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - ImGui::CalcTextSize("apply to sort").x);
+    
+    if(ImGui::Button("apply to sort"))
+    {
+      //TODO: refresh using api endpoint
+      renderer::my_issues.push_back(issue);
+
+    }
+    ImGui::PopID();
+  }
+
+
+  ImGui::PushID(issue.idx);
+  
   if (ImGui::CollapsingHeader("Media", ImGuiTreeNodeFlags_DefaultOpen))
   {
 
@@ -308,9 +424,96 @@ void renderer::draw_issue(Issue& issue)
         ImGui::SameLine();
       }
     }
-    
-    // ImGui::Image((ImTextureID)(intptr_t) bobr_image.rid, ImVec2{(float) bobr_image.width / 10.0f, (float) bobr_image.height / 10.0f});
+
+
+    if (issue.paths.size() == 0)
+    {
+      BB_Image img = renderer::path_to_img["pothole.jpg"];
+      ImGui::Image((ImTextureID)(intptr_t) img.rid, ImVec2{(float) img.width / 1.0f, (float) img.height / 1.0f});
+    }
   }
+
+  ImGui::PopID();
+  
+  ImGui::Separator();
+}
+
+
+void renderer::draw_my_issue(Issue& issue)
+{
+  ImGui::Separator();
+
+  ImGui::Text("%s", issue.title);
+
+  if (ImGui::GetContentRegionMax().x > 300)
+  {
+    std::string credits = std::format("by: {}", issue.author);
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - ImGui::CalcTextSize(credits.c_str()).x);
+    ImGui::Text("by: %s", issue.author);
+  }
+  
+  ImGui::Text("(%s)", issue.status);
+  ImGui::TextWrapped("%s", issue.desc);
+  ImGui::Text("community support: %d", issue.upvotes);
+
+
+
+  if (ImGui::GetContentRegionMax().x > 300)
+  {
+    ImGui::PushID(issue.id);
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - ImGui::CalcTextSize("completed issue!  ").x);
+
+    ImGui::PushID(issue.idx);
+    if(ImGui::Button("completed issue!"))
+    {
+      if (strcmp(issue.status, "resolved") != 0)
+      {
+        renderer::wallet += 10 * issue.upvotes;
+        BackendAPI::setIssueCompleted(issue.id);
+        strcpy(issue.status, "resolved");
+      }
+      
+      
+    }
+    ImGui::PopID();
+
+    
+    if (ImGui::IsItemHovered() && strcmp(issue.status, "resolved") == 0)
+    {
+      ImGui::SetTooltip("you have already completed this!");
+    }
+
+    ImGui::PopID();
+  }
+
+
+  ImGui::PushID(issue.id);
+  
+  if (ImGui::CollapsingHeader("Media", ImGuiTreeNodeFlags_DefaultOpen))
+  {
+
+
+    for (int i = 0; i < issue.paths.size(); i++)
+    {
+      BB_Image img = renderer::path_to_img[issue.paths[i]];
+      ImGui::Image((ImTextureID)(intptr_t) img.rid, ImVec2{(float) img.width / 1.0f, (float) img.height / 1.0f});
+
+      if (i != issue.paths.size() -1)
+      {
+        ImGui::SameLine();
+      }
+    }
+
+
+    if (issue.paths.size() == 0)
+    {
+      BB_Image img = renderer::path_to_img["pothole.jpg"];
+      ImGui::Image((ImTextureID)(intptr_t) img.rid, ImVec2{(float) img.width / 1.0f, (float) img.height / 1.0f});
+    }
+  }
+
   ImGui::PopID();
   
   ImGui::Separator();

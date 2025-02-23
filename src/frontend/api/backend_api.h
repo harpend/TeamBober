@@ -20,6 +20,8 @@ namespace BackendAPI {
 
     // Votes for an issue (POST /issues/<issue_id>/vote)
     std::string voteIssue(const std::string& issueID);
+
+    void setIssueCompleted(const std::string& issueID);
 }
 
 #endif // BACKEND_API_H
