@@ -63,7 +63,7 @@ private:
   std::vector<BB_Image> images;
   std::unordered_map<std::string, BB_Image> path_to_img;
 
-  std::array<std::string, 5> enum_to_bobr = {"poor_bobr.jpg", "babushka_bobr.png", "bat_bobr.png", "cool_bobr.png", "fancy_bobr.png"};
+  std::array<std::string, 5> enum_to_bobr = {"poor_bobr.jpg", "babushka_bobr.jpg", "batbobr_.png", "cool_bobr.jpg", "fancy_bobr.jpg"};
   uint32_t prices[5] = {0, 100, 350, 700, 1000};
 
 
