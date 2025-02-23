@@ -56,11 +56,10 @@ def get_recent_issues():
     issues = mongo.db.issues.find({"status": {"$nin": ["resolved", "rejected"]}}).sort("created_at", -1).limit(10)
     return dumps(issues), 200, {'Content-Type': 'application/json'}
 
-# POST /issues/completed
-@issues_bp.route('/completed', methods=['POST'])
-def report_issue():
-    data = request.form.to_dict()
-    filter = {"issue_id": data['issue_id']}
+# POST /issues/<issue_id>/completed
+@issues_bp.route('/<issue_id>/completed', methods=['POST'])
+def complete_issue(issue_id):
+    filter = {"issue_id": issue_id}
     result = mongo.db.issues.update_one(
         filter,
         {"$set": {"status": "resolved"}}
