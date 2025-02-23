@@ -5,13 +5,16 @@ from routes.upvotes import upvotes_bp
 from routes.microbit import bobr_alert
 import os
 import threading
+from dotenv import load_dotenv
+
+# Load .env variables
+load_dotenv()
 
 app = Flask(__name__)
 
-# MongoDB configuration (include your database name)
-app.config["MONGO_URI"] = "mongodb+srv://austink2109:tvUmNdoJn4wIeUeV@cluster0.l7van.mongodb.net/CommunityReports?retryWrites=true&w=majority"
-# Set the upload folder (absolute path)
-app.config["UPLOAD_FOLDER"] = os.path.abspath(os.path.join(os.path.dirname(__file__), "static", "uploads"))
+# Use environment variables
+app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
+app.config["UPLOAD_FOLDER"] = os.path.abspath(os.path.join(os.path.dirname(__file__), os.environ.get("UPLOAD_FOLDER", "static/uploads")))
 
 # Initialize PyMongo
 mongo.init_app(app)
