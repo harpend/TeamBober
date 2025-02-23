@@ -47,6 +47,7 @@ private:
   void draw_saved_issues();
   void draw_issue(Issue& issue);
   void load_all_images();
+  void load_issues();
 private:
   std::vector<Issue> issues;
   std::vector<BB_Image> images;

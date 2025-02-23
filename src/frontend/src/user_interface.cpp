@@ -45,7 +45,7 @@ void renderer::init()
 
   
   nlohmann::json every_entry= nlohmann::json::parse(BackendAPI::get_issues());
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < every_entry.size(); i++)
   {
     nlohmann::json json_data = every_entry[i];
     Issue issue;
@@ -68,6 +68,33 @@ void renderer::init()
     renderer::issues.push_back(issue);
   }
 
+}
+
+void renderer::load_issues() 
+{
+  renderer::isssues.clear();
+  for (int i = 0; i < every_entry.size(); i++)
+  {
+    nlohmann::json json_data = every_entry[i];
+    Issue issue;
+    std::string desc = json_data["description"];
+    std::string title= json_data["title"];
+    std::string author= json_data["nickname"];
+    strcpy(issue.desc, desc.c_str());
+    strcpy(issue.title, title.c_str());
+    strcpy(issue.author, author.c_str());
+    issue.id = renderer::issues.size();
+
+    auto& paths = json_data["images"];
+
+    for (auto& p : paths)
+    {
+      issue.paths.push_back(p);
+    }
+    
+  
+    renderer::issues.push_back(issue);
+  }
 }
 
 void renderer::shutdown()
@@ -205,6 +232,17 @@ void renderer::draw_menu_bar()
       
         ImGui::EndMenu();
       }
+      
+      ImGui::Separator();
+      if (ImGui::BeginMenu("Refresh"))
+      {
+        ImGui::Text("bobr-app v0.1.0");
+        ImGui::Text("by team-bober");
+        ImGui::SameLine();
+        ImGui::TextLinkOpenURL("(donate)", "https://beavertrust.org/");
+      
+        ImGui::EndMenu();
+      }
 
 
       if (strcmp(renderer::username, "king-bobr") == 0)
@@ -240,7 +278,9 @@ void renderer::draw_community_feed()
   static float cooldown = 0.0;
   
   ImGui::Begin("Community Feed", NULL, ImGuiWindowFlags_NoScrollbar);
-
+  if (ImGui::Button("Refresh")) {
+    load_issues();
+  }
   for (auto& issue : issues)
   {
     draw_issue(issue);
