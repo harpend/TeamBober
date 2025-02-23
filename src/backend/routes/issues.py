@@ -55,6 +55,12 @@ def get_recent_issues():
     issues = mongo.db.issues.find({"status": {"$nin": ["resolved", "rejected"]}}).sort("created_at", -1).limit(10)
     return dumps(issues), 200, {'Content-Type': 'application/json'}
 
+# GET /issues/recent
+@issues_bp.route('/completed', methods=['GET'])
+def get_recent_issues():
+    issues = mongo.db.issues.find({"status": "resolved"}).sort("created_at", -1).limit(10)
+    return dumps(issues), 200, {'Content-Type': 'application/json'}
+
 # GET /issues/get_issue - returns a random issue
 @issues_bp.route('/get_issue', methods=['GET'])
 def get_random_issue():
