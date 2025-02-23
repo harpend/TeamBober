@@ -13,7 +13,7 @@ This defines endpoints for reporting issues, retrieving lists of unresolved or r
 
 ## microbit.py
 
-This contains functionality for integrating with the microbit where we monitor the most upvoted issues and communicates to display alerts while updating the issue's status. The user of microbit device can press either A to confirm an issue was fixed or B to reject it.
+This contains functionality for integrating with the microbit where we monitor the most upvoted issues and communicate to display alerts while updating the issue's status. The user of microbit device can press either A to confirm an issue was fixed or B to reject it.
 
 ## upvotes.py
 The upvotes.py file defines a Flask blueprint for handling operations related to saving and voting on issues. It provides endpoints that allow clients to mark an issue as saved, retrieve all saved issues, cast a vote for an issue by incrementing its upvotes, and fetch the top ten trending issues sorted by upvotes. Each endpoint interacts with the MongoDB database, returning JSON responses that include the updated issue data or an error message if the issue isn't found.
