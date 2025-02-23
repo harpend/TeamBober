@@ -1,4 +1,4 @@
-#include "BackendAPI.h"
+#include "backend_api.h"
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 #include <iostream>
@@ -16,7 +16,7 @@ static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* use
 
 namespace BackendAPI {
 
-std::string getIssues() {
+std::string get_issues() {
     CURL* curl;
     CURLcode res;
     std::string response;
@@ -25,7 +25,7 @@ std::string getIssues() {
     curl = curl_easy_init();
     if (curl) {
         // Set URL for GET /issues
-        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:5000/issues");
+        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:5000/issues/recent");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
