@@ -2,8 +2,9 @@ from flask import Flask, send_from_directory
 from db import mongo
 from routes.issues import issues_bp
 from routes.upvotes import upvotes_bp
-from routes.microbit import microbit_bp
+from routes.microbit import bobr_alert
 import os
+import threading
 
 app = Flask(__name__)
 
@@ -18,7 +19,7 @@ mongo.init_app(app)
 # Register blueprints with proper URL prefixes
 app.register_blueprint(issues_bp, url_prefix="/issues")
 app.register_blueprint(upvotes_bp, url_prefix="/issues")
-app.register_blueprint(microbit_bp, url_prefix="/microbit")
+# app.register_blueprint(microbit_bp, url_prefix="/microbit")
 
 # Route for serving uploaded files
 @app.route('/uploads/<path:filename>')
@@ -26,4 +27,6 @@ def serve_uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 if __name__ == '__main__':
+    thread = threading.Thread(target=bobr_alert, daemon=True)
+    thread.start()
     app.run(debug=True)
