@@ -60,10 +60,15 @@ void renderer::init()
     std::string desc = json_data["description"];
     std::string title= json_data["title"];
     std::string author= json_data["nickname"];
+    std::string id_str = json_data["issue_id"];
+
+    std::println("issue id {}", id_str);
+    
     strcpy(issue.desc, desc.c_str());
     strcpy(issue.title, title.c_str());
     strcpy(issue.author, author.c_str());
-    issue.id = renderer::issues.size();
+    strcpy(issue.id, id_str.c_str());
+    // issue.id = renderer::issues.size();
     issue.upvotes = json_data["upvotes"];
     issue.idx = renderer::issues.size();
 
@@ -356,10 +361,21 @@ void renderer::draw_issue(Issue& issue)
   ImGui::Text("community support: %d", issue.upvotes);
 
 
+  ImGui::PushID(issue.idx);
+  if(ImGui::ArrowButton("##up", ImGuiDir_Up))
+  {
+    issue.upvotes++;
+    std::string is = issue.id;
+    BackendAPI::voteIssue(is);
+    
+    std::println("{}", issue.id);
+  }
+  ImGui::PopID();
+
 
   if (ImGui::GetContentRegionMax().x > 300)
   {
-    ImGui::PushID(issue.id);
+    ImGui::PushID(issue.idx);
     ImGui::SameLine();
     ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - ImGui::CalcTextSize("apply to sort").x);
     
@@ -372,7 +388,7 @@ void renderer::draw_issue(Issue& issue)
   }
 
 
-  ImGui::PushID(issue.id);
+  ImGui::PushID(issue.idx);
   
   if (ImGui::CollapsingHeader("Media", ImGuiTreeNodeFlags_DefaultOpen))
   {

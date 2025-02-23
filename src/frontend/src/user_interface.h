@@ -23,7 +23,7 @@ struct Issue
   char title[50] {0};
   char location[15] {0};
   uint8_t status {0};
-  uint32_t id {0};
+  char id[7];
   uint32_t upvotes {1};
   uint32_t idx{0};
 

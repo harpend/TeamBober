@@ -5,6 +5,7 @@
 #include <sstream>
 #include <ctime>
 #include <iomanip>
+#include <print>
 
 // Callback for libcurl to write received data into a std::string.
 static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
@@ -103,10 +104,11 @@ std::string voteIssue(const std::string& issueID) {
     CURL* curl;
     CURLcode res;
     std::string response;
-    std::stringstream urlStream;
-    urlStream << "http://127.0.0.1:5000/issues/" << issueID << "/vote";
-    std::string url = urlStream.str();
-
+    // std::stringstream urlStream;
+    // urlStream << "http://127.0.0.1:5000/issues/" << issueID << "/vote";
+    std::string url = std::format("http://127.0.0.1:5000/issues/{}/vote", issueID);
+    std::println("vote at {}", url);
+    
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
     if (curl) {
