@@ -4,6 +4,12 @@
 #include <cstdint>
 #include <unordered_map>
 
+// enum cxxxlass bober_fits
+// {
+//   NONE,
+  
+// }
+
 struct Issue
 {
   char author[50] {0};

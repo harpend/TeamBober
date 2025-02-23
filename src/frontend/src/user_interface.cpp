@@ -293,12 +293,20 @@ void renderer::draw_issue(Issue& issue)
 
 
   ImGui::PushID(issue.id);
+  static int img_idx = 0;
   if (ImGui::CollapsingHeader("Media", ImGuiTreeNodeFlags_DefaultOpen))
   {
-    for (std::string p : issue.paths)
+
+
+    for (int i = 0; i < issue.paths.size(); i++)
     {
-      BB_Image img = renderer::path_to_img[p];
+      BB_Image img = renderer::path_to_img[issue.paths[i]];
       ImGui::Image((ImTextureID)(intptr_t) img.rid, ImVec2{(float) img.width / 1.0f, (float) img.height / 1.0f});
+
+      if (i != issue.paths.size() -1)
+      {
+        ImGui::SameLine();
+      }
     }
     
     // ImGui::Image((ImTextureID)(intptr_t) bobr_image.rid, ImVec2{(float) bobr_image.width / 10.0f, (float) bobr_image.height / 10.0f});
