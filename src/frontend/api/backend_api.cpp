@@ -16,7 +16,7 @@ static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* use
 
 namespace BackendAPI {
 
-std::string get_random_issue() {
+std::string get_issues() {
     CURL* curl;
     CURLcode res;
     std::string response;
@@ -25,7 +25,7 @@ std::string get_random_issue() {
     curl = curl_easy_init();
     if (curl) {
         // Set URL for GET /issues
-        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:5000/issues/get_issue");
+        curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:5000/issues/recent");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 

@@ -5,13 +5,13 @@
 
 struct Issue
 {
-  char author[50] {"John Doe"};
-  char desc[500] { "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras et nibh erat. Integer turpis orci, tempus id quam eu, posuere blandit risus. Integer sed tincidunt magna, ut porta enim. Donec imperdiet placerat augue, vel maximus ante placerat id."};
-  char title[50] {"Loren ipsum"};
-  char location[15];
-  uint8_t status;
-  uint32_t id;
-  uint32_t upvotes;
+  char author[50] {0};
+  char desc[500] {0};
+  char title[50] {0};
+  char location[15] {0};
+  uint8_t status {0};
+  uint32_t id {0};
+  uint32_t upvotes {0};
   
 };
 
@@ -36,7 +36,6 @@ private:
   void draw_create_issue();
   void draw_saved_issues();
   void draw_issue(Issue& issue);
-  void add_issue();
   void load_all_images();
 private:
   std::vector<Issue> issues;

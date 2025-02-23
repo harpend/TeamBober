@@ -6,7 +6,7 @@
 
 namespace BackendAPI {
     // Fetches all issues from the backend (GET /issues)
-    std::string get_random_issue();
+    std::string get_issues();
 
     // Creates a new issue (POST /issues) with default fields:
     // - status: "pending"
