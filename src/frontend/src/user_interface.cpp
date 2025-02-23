@@ -69,6 +69,9 @@ void renderer::load_issues()
     strcpy(issue.author, author.c_str());
     issue.idx = renderer::issues.size();
 
+    std::string stat = json_data["status"];
+    strcpy(issue.status, stat.c_str());
+
     issue.upvotes = json_data["upvotes"];
 
 
@@ -382,7 +385,7 @@ void renderer::draw_issue(Issue& issue)
     ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - ImGui::CalcTextSize(credits.c_str()).x);
     ImGui::Text("by: %s", issue.author);
   }
-  
+  ImGui::Text("(%s)", issue.status);
   ImGui::TextWrapped("%s", issue.desc);
   ImGui::Text("community support: %d", issue.upvotes);
 
