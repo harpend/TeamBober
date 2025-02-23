@@ -248,7 +248,12 @@ void renderer::draw_create_issue()
   ImGui::InputTextMultiline("description", new_issue.desc, 500, ImVec2{0, 0});
   ImGui::InputText("location", new_issue.location, 15);
   ImGui::Button("add media");
-  ImGui::Button("create issue");
+  if (ImGui::Button("create issue"))
+  {
+    strcpy(new_issue.author, renderer::username);
+    renderer::issues.push_back(new_issue);
+    new_issue = {};
+  }
     
   ImGui::End();
 }

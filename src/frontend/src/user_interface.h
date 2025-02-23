@@ -15,7 +15,7 @@ struct Issue
   uint32_t upvotes {0};
 
 
-  std::vector<std::string> paths;
+  std::vector<std::string> paths{};
   
 };
 
