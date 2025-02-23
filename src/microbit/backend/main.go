@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tarm/serial"
@@ -9,7 +10,7 @@ import (
 
 func main() {
 	config := &serial.Config{
-		Name: "/dev/ttyACM0",
+		Name: "/dev/ttyACM1",
 		Baud: 115200,
 	}
 
@@ -24,6 +25,20 @@ func main() {
 	router.Run(":8080")
 }
 
+func splitIntoChunks(s string, chunkSize int) []string {
+	var chunks []string
+	for i := 0; i < len(s); i += chunkSize {
+		end := i + chunkSize
+		if end > len(s) {
+			end = len(s)
+		}
+
+		chunk := s[i:end] + "\n"
+		chunks = append(chunks, chunk)
+	}
+	return chunks
+}
+
 func NewBobr(ctx *gin.Context, s *serial.Port) {
 	type params struct {
 		Text string `json:"Text"`
@@ -36,18 +51,24 @@ func NewBobr(ctx *gin.Context, s *serial.Port) {
 		return
 	}
 
-	data.Text = data.Text + "\n"
-	_, err := s.Write([]byte(data.Text))
-	if err != nil {
-		log.Println(err)
+	chunks := splitIntoChunks(data.Text, 19)
+	for _, chunk := range chunks {
+		_, err := s.Write([]byte(chunk))
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
-	log.Println(data.Text)
 	buf := make([]byte, 128)
 	n, err := s.Read((buf))
 	if err != nil {
 		log.Println(err)
 	}
 
-	ctx.JSON(200, string(buf[:n]))
+	// completed
+	if strings.Contains(string(buf[:n]), "R") || strings.Contains(string(buf[:n]), "j") || strings.Contains(string(buf[:n]), "c") {
+		ctx.JSON(204, string(buf[:n]))
+	} else {
+		ctx.JSON(200, string(buf[:n]))
+	}
 }
