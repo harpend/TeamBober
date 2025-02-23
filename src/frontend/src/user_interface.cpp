@@ -49,45 +49,14 @@ void renderer::init()
     bb_utils::load_from_file(std::string("assets/").append(renderer::enum_to_bobr[i]).c_str(), &img.rid, &img.width, &img.height);
     renderer::path_to_img[renderer::enum_to_bobr[i].c_str()] = img;
   }
-   
-
   
-  nlohmann::json every_entry= nlohmann::json::parse(BackendAPI::get_issues());
-  for (int i = 0; i < every_entry.size(); i++)
-  {
-    nlohmann::json json_data = every_entry[i];
-    Issue issue;
-    std::string desc = json_data["description"];
-    std::string title= json_data["title"];
-    std::string author= json_data["nickname"];
-    std::string id_str = json_data["issue_id"];
-
-    std::println("issue id {}", id_str);
-    
-    strcpy(issue.desc, desc.c_str());
-    strcpy(issue.title, title.c_str());
-    strcpy(issue.author, author.c_str());
-    strcpy(issue.id, id_str.c_str());
-    // issue.id = renderer::issues.size();
-    issue.upvotes = json_data["upvotes"];
-    issue.idx = renderer::issues.size();
-
-    auto& paths = json_data["images"];
-
-    for (auto& p : paths)
-    {
-      issue.paths.push_back(p);
-    }
-    
-  
-    renderer::issues.push_back(issue);
-  }
-
+  load_issues();
 }
 
 void renderer::load_issues() 
 {
   renderer::isssues.clear();
+  nlohmann::json every_entry= nlohmann::json::parse(BackendAPI::get_issues());
   for (int i = 0; i < every_entry.size(); i++)
   {
     nlohmann::json json_data = every_entry[i];
