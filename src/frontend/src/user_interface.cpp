@@ -259,16 +259,6 @@ void renderer::draw_menu_bar()
         ImGui::EndMenu();
       }
       
-      ImGui::Separator();
-      if (ImGui::BeginMenu("Refresh"))
-      {
-        ImGui::Text("bobr-app v0.1.0");
-        ImGui::Text("by team-bober");
-        ImGui::SameLine();
-        ImGui::TextLinkOpenURL("(donate)", "https://beavertrust.org/");
-      
-        ImGui::EndMenu();
-      }
 
 
       if (strcmp(renderer::username, "king-bobr") == 0)
@@ -412,6 +402,7 @@ void renderer::draw_issue(Issue& issue)
     {
       //TODO: refresh using api endpoint
       renderer::my_issues.push_back(issue);
+
     }
     ImGui::PopID();
   }
@@ -462,6 +453,7 @@ void renderer::draw_my_issue(Issue& issue)
     ImGui::Text("by: %s", issue.author);
   }
   
+  ImGui::Text("(%s)", issue.status);
   ImGui::TextWrapped("%s", issue.desc);
   ImGui::Text("community support: %d", issue.upvotes);
 
@@ -472,11 +464,27 @@ void renderer::draw_my_issue(Issue& issue)
     ImGui::PushID(issue.id);
     ImGui::SameLine();
     ImGui::SetCursorPosX(ImGui::GetContentRegionMax().x - ImGui::CalcTextSize("completed issue!  ").x);
-    
+
+    ImGui::PushID(issue.idx);
     if(ImGui::Button("completed issue!"))
     {
-      renderer::wallet += 10 * issue.upvotes;
+      if (strcmp(issue.status, "resolved") != 0)
+      {
+        renderer::wallet += 10 * issue.upvotes;
+        BackendAPI::setIssueCompleted(issue.id);
+        strcpy(issue.status, "resolved");
+      }
+      
+      
     }
+    ImGui::PopID();
+
+    
+    if (ImGui::IsItemHovered() && strcmp(issue.status, "resolved") == 0)
+    {
+      ImGui::SetTooltip("you have already completed this!");
+    }
+
     ImGui::PopID();
   }
 
