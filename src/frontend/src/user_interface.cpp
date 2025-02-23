@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <format>
 #include <string.h>
-#include <ranges>
+#include <algorithm>
 #include <nlohmann/json.hpp>
 #include "../api/backend_api.h"
 #include "imgui_internal.h"
@@ -31,13 +31,17 @@ void renderer::init()
 
 
   // load every file in backend static
-  std::filesystem::path dir = "../../backend/static/uploads";
+  std::filesystem::path dir = "assets/static/uploads/";
   std::ranges::for_each(
     std::filesystem::directory_iterator{dir},
-    [](const auto& dir_entry) {std::println("{}", dir_entry)};
+    [this](std::filesystem::path dir_entry) {
+      std::println("{}", dir_entry.c_str());
+      BB_Image img;
+      bb_utils::load_from_file(dir_entry.c_str(), &img.rid, &img.width, &img.height);
+      renderer::path_to_img[dir_entry.filename().c_str()] = img;
+    }
   );
-  
-  
+   
 
   
   nlohmann::json every_entry= nlohmann::json::parse(BackendAPI::get_issues());
@@ -52,6 +56,14 @@ void renderer::init()
     strcpy(issue.title, title.c_str());
     strcpy(issue.author, author.c_str());
     issue.id = renderer::issues.size();
+
+    auto& paths = json_data["images"];
+
+    for (auto& p : paths)
+    {
+      issue.paths.push_back(p);
+    }
+    
   
     renderer::issues.push_back(issue);
   }
@@ -278,7 +290,13 @@ void renderer::draw_issue(Issue& issue)
   ImGui::PushID(issue.id);
   if (ImGui::CollapsingHeader("Media", ImGuiTreeNodeFlags_DefaultOpen))
   {
-    ImGui::Image((ImTextureID)(intptr_t) bobr_image.rid, ImVec2{(float) bobr_image.width / 10.0f, (float) bobr_image.height / 10.0f});
+    for (std::string p : issue.paths)
+    {
+      BB_Image img = renderer::path_to_img[p];
+      ImGui::Image((ImTextureID)(intptr_t) img.rid, ImVec2{(float) img.width / 1.0f, (float) img.height / 1.0f});
+    }
+    
+    // ImGui::Image((ImTextureID)(intptr_t) bobr_image.rid, ImVec2{(float) bobr_image.width / 10.0f, (float) bobr_image.height / 10.0f});
   }
   ImGui::PopID();
   

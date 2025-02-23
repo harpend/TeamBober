@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <unordered_map>
 
 struct Issue
 {
@@ -12,6 +13,9 @@ struct Issue
   uint8_t status {0};
   uint32_t id {0};
   uint32_t upvotes {0};
+
+
+  std::vector<std::string> paths;
   
 };
 
@@ -40,6 +44,7 @@ private:
 private:
   std::vector<Issue> issues;
   std::vector<BB_Image> images;
+  std::unordered_map<std::string, BB_Image> path_to_img;
 
   BB_Image bobr_image;
   char username[50] {"guest"};
