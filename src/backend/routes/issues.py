@@ -46,7 +46,7 @@ def report_issue():
 # GET /issues
 @issues_bp.route('', methods=['GET'])
 def get_issues():
-    issues = mongo.db.issues.find()
+    issues = mongo.db.issues.find({"status": {"$nin": ["resolved", "rejected"]}})
     return dumps(issues), 200, {'Content-Type': 'application/json'}
 
 # GET /issues/recent
