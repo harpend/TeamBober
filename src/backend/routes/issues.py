@@ -4,6 +4,7 @@ from db import mongo
 from werkzeug.utils import secure_filename
 import os
 import random
+import requests
 
 issues_bp = Blueprint('issues', __name__)
 
@@ -55,11 +56,16 @@ def get_recent_issues():
     issues = mongo.db.issues.find({"status": {"$nin": ["resolved", "rejected"]}}).sort("created_at", -1).limit(10)
     return dumps(issues), 200, {'Content-Type': 'application/json'}
 
-# GET /issues/recent
-@issues_bp.route('/completed', methods=['GET'])
-def get_recent_issues():
-    issues = mongo.db.issues.find({"status": "resolved"}).sort("created_at", -1).limit(10)
-    return dumps(issues), 200, {'Content-Type': 'application/json'}
+# POST /issues/completed
+@issues_bp.route('/completed', methods=['POST'])
+def report_issue():
+    data = request.form.to_dict()
+    filter = {"issue_id": data['issue_id']}
+    result = mongo.db.issues.update_one(
+        filter,
+        {"$set": {"status": "resolved"}}
+    )
+    return dumps(""), 201, {'Content-Type': 'application/json'}
 
 # GET /issues/get_issue - returns a random issue
 @issues_bp.route('/get_issue', methods=['GET'])
