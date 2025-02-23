@@ -55,6 +55,7 @@ private:
   void draw_issue(Issue& issue);
   void draw_my_issue(Issue& issue);
   void load_all_images();
+  void load_issues();
 private:
   std::vector<Issue> issues;
   std::vector<Issue> my_issues;
